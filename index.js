@@ -32,6 +32,28 @@ async function run() {
             const dress = await dressCollection.findOne(query);
             res.send(dress);
         });
+
+        app.put("/dress/:id", async (req, res) => {
+            const id = req.params.id;
+            const updatedRestock = req.body;
+            const filter = { _id: ObjectId(id) };
+            const updatedDoc = {
+                $set: {
+                    quantity: updatedRestock.restock,
+                },
+            };
+            const result = await dressCollection.updateOne(filter, updatedDoc);
+            res.send(result);
+        });
+
+        app.post("/dress/:id", async (req, res) => {
+            const id = req.params.id;
+            const result = dressCollection.updateOne(
+                { _id: ObjectId(id) },
+                { $inc: { quantity: -1 } }
+            );
+            res.send(result);
+        });
     } finally {
     }
 }
