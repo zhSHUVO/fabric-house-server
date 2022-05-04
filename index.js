@@ -46,12 +46,16 @@ async function run() {
             res.send(result);
         });
 
-        app.post("/dress/:id", async (req, res) => {
+        app.put("/dress/:id", async (req, res) => {
             const id = req.params.id;
-            const result = dressCollection.updateOne(
-                { _id: ObjectId(id) },
-                { $inc: { quantity: -1 } }
-            );
+            const decreaseStock = req.body;
+            const filter = { _id: ObjectId(id) };
+            const updatedDoc = {
+                $set: {
+                    quantity: decreaseStock.count,
+                },
+            };
+            const result = await dressCollection.updateOne(filter, updatedDoc);
             res.send(result);
         });
 
@@ -60,6 +64,13 @@ async function run() {
             const query = { _id: ObjectId(id) };
             const result = await dressCollection.deleteOne(query);
             res.send(result);
+        });
+
+        app.post("/dress", async (req, res) => {
+            const newDress = req.body;
+            console.log("adding new dress", newDress);
+            const result = await dressCollection.insertOne(newDress);
+            res.send(result); 
         });
     } finally {
     }
