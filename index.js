@@ -35,28 +35,40 @@ async function run() {
 
         app.put("/dress/:id", async (req, res) => {
             const id = req.params.id;
-            const updatedRestock = req.body;
+            const updateRestock = req.body;
+            const incCount = updateRestock.restock + updateRestock.count;
+            console.log(
+                "restock and currentStock",
+                updateRestock.restock,
+                updateRestock.count
+            );
             const filter = { _id: ObjectId(id) };
-            const updatedDoc = {
-                $set: {
-                    quantity: updatedRestock.restock,
-                },
-            };
-            const result = await dressCollection.updateOne(filter, updatedDoc);
-            res.send(result);
-        });
-
-        app.put("/dress/:id", async (req, res) => {
-            const id = req.params.id;
-            const decreaseStock = req.body;
-            const filter = { _id: ObjectId(id) };
-            const updatedDoc = {
-                $set: {
-                    quantity: decreaseStock.count,
-                },
-            };
-            const result = await dressCollection.updateOne(filter, updatedDoc);
-            res.send(result);
+            if (incCount > 0) {
+                console.log("Restock");
+                const updatedDoc = {
+                    $set: {
+                        quantity: incCount,
+                    },
+                };
+                const result = await dressCollection.updateOne(
+                    filter,
+                    updatedDoc
+                );
+                res.send(result);
+            } else {
+                const decCount = updateRestock.count - 1;
+                console.log("delivered: " + decCount);
+                const updatedDoc = {
+                    $set: {
+                        quantity: decCount,
+                    },
+                };
+                const result = await dressCollection.updateOne(
+                    filter,
+                    updatedDoc
+                );
+                res.send(result);
+            }
         });
 
         app.delete("/dress/:id", async (req, res) => {
@@ -70,7 +82,7 @@ async function run() {
             const newDress = req.body;
             console.log("adding new dress", newDress);
             const result = await dressCollection.insertOne(newDress);
-            res.send(result); 
+            res.send(result);
         });
     } finally {
     }
