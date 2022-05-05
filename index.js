@@ -35,40 +35,15 @@ async function run() {
 
         app.put("/dress/:id", async (req, res) => {
             const id = req.params.id;
-            const updateRestock = req.body;
-            const incCount = updateRestock.restock + updateRestock.count;
-            console.log(
-                "restock and currentStock",
-                updateRestock.restock,
-                updateRestock.count
-            );
+            const updateStockValue = req.body;
             const filter = { _id: ObjectId(id) };
-            if (incCount > 0) {
-                console.log("Restock");
-                const updatedDoc = {
-                    $set: {
-                        quantity: incCount,
-                    },
-                };
-                const result = await dressCollection.updateOne(
-                    filter,
-                    updatedDoc
-                );
-                res.send(result);
-            } else {
-                const decCount = updateRestock.count - 1;
-                console.log("delivered: " + decCount);
-                const updatedDoc = {
-                    $set: {
-                        quantity: decCount,
-                    },
-                };
-                const result = await dressCollection.updateOne(
-                    filter,
-                    updatedDoc
-                );
-                res.send(result);
-            }
+            const updatedDoc = {
+                $set: {
+                    quantity: updateStockValue.updatedQuentity,
+                },
+            };
+            const result = await dressCollection.updateOne(filter, updatedDoc);
+            res.send(result);
         });
 
         app.delete("/dress/:id", async (req, res) => {
