@@ -18,7 +18,10 @@ const client = new MongoClient(uri, {
 async function run() {
     try {
         await client.connect();
+
         const dressCollection = client.db("fabricHouse").collection("dress");
+        const itemCollection = client.db("fabricHouse").collection("item");
+
         app.get("/dress", async (req, res) => {
             const query = {};
             const cursor = dressCollection.find(query);
@@ -57,6 +60,27 @@ async function run() {
             const newDress = req.body;
             console.log("adding new dress", newDress);
             const result = await dressCollection.insertOne(newDress);
+            res.send(result);
+        });
+
+        // load items
+        app.get("/item", async (req, res) => {
+            const email = req.query.email;
+            const query = { userMail: email };
+            const cursor = itemCollection.find(query);
+            const items = await cursor.toArray();
+            res.send(items);
+        });
+
+        app.post("/item", async (req, res) => {
+            const item = req.body;
+            const result = await itemCollection.insertOne(item);
+            res.send(result);
+        });
+        app.delete("(/item/:id)", async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await itemCollection.deleteOne(query);
             res.send(result);
         });
     } finally {
