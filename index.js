@@ -42,6 +42,7 @@ async function run() {
         // authorize
         app.post("/login", async (req, res) => {
             const user = req.body;
+
             const accessToken = jwt.sign(
                 user,
                 process.env.ACCESS_TOKEN_SECRET,
@@ -100,7 +101,7 @@ async function run() {
             const email = req.query.email;
             if (email === decodedEmail) {
                 const query = { userMail: email };
-                const cursor = itemCollection.find(query);
+                const cursor = dressCollection.find(query);
                 const items = await cursor.toArray();
                 res.send(items);
             } else {
@@ -110,13 +111,14 @@ async function run() {
 
         app.post("/item", async (req, res) => {
             const item = req.body;
-            const result = await itemCollection.insertOne(item);
+            const result = await dressCollection.insertOne(item);
             res.send(result);
         });
+
         app.delete("(/item/:id)", async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
-            const result = await itemCollection.deleteOne(query);
+            const result = await dressCollection.deleteOne(query);
             res.send(result);
         });
     } finally {
